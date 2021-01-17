@@ -9,7 +9,6 @@ class MirotestServerApplicationTests {
 
     @Test
     void contextLoads() {
-        Assert.isTrue(false);
     }
 
 }
