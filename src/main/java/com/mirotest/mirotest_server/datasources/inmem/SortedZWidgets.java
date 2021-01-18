@@ -39,7 +39,11 @@ class ConsecutiveWidgets {
         } else {
             widgets.add(widget.zIndex - first, widget);
             var iter = widgets.listIterator(widget.zIndex - first + 1);
-            iter.forEachRemaining(widget1 -> widget1.zIndex++);
+            long time = System.currentTimeMillis();
+            iter.forEachRemaining(widget1 -> {
+                widget1.zIndex++;
+                widget1.lastModificationTime.setTime(time);
+            });
             last++;
         }
     }

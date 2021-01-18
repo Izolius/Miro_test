@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class WidgetChagesApplierTest {
+class WidgetChangesApplierTest {
 
     @Test
     void withoutChanges() {
@@ -14,7 +14,7 @@ class WidgetChagesApplierTest {
         var changes = new WidgetChanges();
         var creationDate = widget.lastModificationTime;
 
-        WidgetChagesApplier.applyChanges(widget, changes);
+        WidgetChangesApplier.applyChanges(widget, changes);
 
         assertEquals(creationDate, widget.lastModificationTime);
     }
@@ -24,18 +24,18 @@ class WidgetChagesApplierTest {
         var widget = new Widget();
         var changes = new WidgetChanges();
         changes.zIndex = 2;
-        var creationDate = widget.lastModificationTime;
+        var creationDate = widget.lastModificationTime.getTime();
         try {
             // or time won't change
-            Thread.sleep(1000);
+            Thread.sleep(1);
         }
         catch (Exception e){
 
         }
 
-        WidgetChagesApplier.applyChanges(widget, changes);
+        WidgetChangesApplier.applyChanges(widget, changes);
 
         assertEquals(widget.zIndex, 2);
-        assertNotEquals(widget.lastModificationTime, creationDate);
+        assertNotEquals(widget.lastModificationTime.getTime(), creationDate);
     }
 }

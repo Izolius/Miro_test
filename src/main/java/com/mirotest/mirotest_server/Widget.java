@@ -19,4 +19,11 @@ public class Widget {
     public Widget() {
         this(0);
     }
+
+    public Widget(CreateWidgetParams params) {
+        this(params.zIndex);
+        this.width = params.width;
+        this.height = params.height;
+        this.coord = params.coord;
+    }
 }

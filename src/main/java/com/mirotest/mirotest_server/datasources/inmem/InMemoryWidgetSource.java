@@ -21,7 +21,6 @@ public class InMemoryWidgetSource implements IWidgetDataSource {
         try {
             sortedZWidgets.add(widget);
             widgetsById.put(widget.id, widget);
-            widget.lastModificationTime = new Date();
             return widget;
         }
         finally {
@@ -36,7 +35,7 @@ public class InMemoryWidgetSource implements IWidgetDataSource {
             var widget = widgetsById.get(id);
             if (widget != null) {
                 sortedZWidgets.remove(widget);
-                WidgetChagesApplier.applyChanges(widget, changes);
+                WidgetChangesApplier.applyChanges(widget, changes);
                 sortedZWidgets.add(widget);
                 return widget;
             }
@@ -75,4 +74,17 @@ public class InMemoryWidgetSource implements IWidgetDataSource {
             rwLock.readLock().unlock();
         }
     }
+
+    @Override
+    public Widget getWidget(UUID id) {
+        rwLock.readLock().lock();
+        try {
+            return widgetsById.get(id);
+        }
+        finally {
+            rwLock.readLock().unlock();
+        }
+    }
+
+
 }

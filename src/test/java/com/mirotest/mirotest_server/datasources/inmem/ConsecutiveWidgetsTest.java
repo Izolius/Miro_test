@@ -18,6 +18,21 @@ class ConsecutiveWidgetsTest {
     }
 
     @Test
+    void addSameTimeChanged() {
+        var cons = new ConsecutiveWidgets();
+        var first = new Widget();
+        cons.add(first);
+        var creationTime = first.lastModificationTime.getTime();
+        try {
+            Thread.sleep(1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        cons.add(new Widget());
+        assertNotEquals(creationTime, first.lastModificationTime.getTime());
+    }
+
+    @Test
     void addToEnd() {
         var cons = new ConsecutiveWidgets();
         cons.add(new Widget());

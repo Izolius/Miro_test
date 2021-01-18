@@ -5,7 +5,7 @@ import com.mirotest.mirotest_server.WidgetChanges;
 
 import java.util.Date;
 
-public class WidgetChagesApplier {
+public class WidgetChangesApplier {
 
     public static void applyChanges(Widget widget, WidgetChanges changes) {
         boolean wasChanged = false;
@@ -26,6 +26,6 @@ public class WidgetChagesApplier {
             wasChanged = true;
         }
         if (wasChanged)
-            widget.lastModificationTime = new Date();
+            widget.lastModificationTime.setTime(System.currentTimeMillis());
     }
 }

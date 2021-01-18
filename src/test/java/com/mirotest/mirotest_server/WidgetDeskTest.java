@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
-
+// With more logic in WidgetDesk it make sense to test it
 @SpringBootTest
 class WidgetDeskTest {
 

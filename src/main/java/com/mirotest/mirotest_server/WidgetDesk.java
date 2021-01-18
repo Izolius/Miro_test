@@ -48,5 +48,10 @@ public class WidgetDesk {
         return widgets.getSortedZWidgets();
     }
 
+    @Nullable
+    public Widget getWidget(UUID id) {
+        return widgets.getWidget(id);
+    }
+
 
 }
