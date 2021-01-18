@@ -45,5 +45,13 @@ class WidgetDeskTest {
         assertEquals(first, desk.getWidgets().toArray()[0]);
     }
 
+    @Test
+    void getWidget() {
+        var first = new Widget(1);
+        desk.addWidget(first);
+        assertEquals(first, desk.getWidget(first.id));
+    }
+
+
 
 }
