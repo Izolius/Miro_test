@@ -1,13 +1,23 @@
 package com.mirotest.mirotest_server;
 
+import com.mirotest.mirotest_server.datasources.IWidgetDataSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.UUID;
 
 @Component
 public class WidgetDesk {
+
+    IWidgetDataSource widgets;
+
+    public WidgetDesk(@Autowired IWidgetDataSource widgets) {
+        this.widgets = widgets;
+    }
     /**
      *
      * @param widget widget to add
@@ -15,27 +25,27 @@ public class WidgetDesk {
      */
     @NonNull
     public Widget addWidget(Widget widget) {
-        return widget;
+        return widgets.addWidget(widget);
     }
 
-    public boolean deleteWidget(UUID id) {
-        return false;
+    public boolean removeWidget(UUID id) {
+        return widgets.deleteWidget(id);
     }
 
     /**
      *
      * @param id id of widget to change
-     * @param newWidget new fields for widget
-     * @return changed version of same @param
+     * @param changes new fields for widget
+     * @return changed version of widget or null if widget doesn't exist
      */
-    @NonNull
-    public Widget changeWidget(UUID id, Widget newWidget) { // TODO: specify exception type
-        return newWidget;
+    @Nullable
+    public Widget changeWidget(UUID id, WidgetChanges changes) {
+        return widgets.changeWidget(id, changes);
     }
 
     @NonNull
-    public ArrayList<Widget> getWidgets() {
-        return new ArrayList<>();
+    public Collection<Widget> getWidgets() {
+        return widgets.getSortedZWidgets();
     }
 
 

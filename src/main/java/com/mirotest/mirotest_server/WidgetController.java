@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 @RestController
 public class WidgetController {
 
@@ -18,6 +21,17 @@ public class WidgetController {
     }
     @PostMapping(value = "/create", produces = { MediaType.APPLICATION_JSON_VALUE }, consumes = MediaType.APPLICATION_JSON_VALUE)
     public Widget createWidget(@RequestBody createWidgetRequest request) {
-        return new Widget();
+        var widget = new Widget();
+        widget.coord = request.coord;
+        widget.width = request.width;
+        widget.height = request.height;
+        widget.zIndex = request.zIndex;
+
+        return widgetDesk.addWidget(widget);
+    }
+
+    @GetMapping(value = "/list", produces = { MediaType.APPLICATION_JSON_VALUE }, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Collection<Widget> widgetList() {
+        return widgetDesk.getWidgets();
     }
 }

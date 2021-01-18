@@ -9,4 +9,14 @@ public class Widget {
     public int width, height;
     public Date lastModificationTime;
     public UUID id;
+
+    public Widget(int zIndex) {
+        this.zIndex = zIndex;
+        id = UUID.randomUUID();
+        lastModificationTime = new Date();
+    }
+
+    public Widget() {
+        this(0);
+    }
 }
