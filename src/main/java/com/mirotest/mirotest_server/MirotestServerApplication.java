@@ -17,11 +17,6 @@ public class MirotestServerApplication {
         SpringApplication.run(MirotestServerApplication.class, args);
     }
 
-    @GetMapping("/hello")
-    public String sayHello(@RequestParam(value = "myName", defaultValue = "World") String name) {
-        return String.format("Hello  %s!", name);
-    }
-
     @Bean
     public IWidgetDataSource getDataSource() {
         return new InMemoryWidgetSource();
