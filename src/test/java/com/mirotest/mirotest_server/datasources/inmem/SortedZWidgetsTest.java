@@ -1,5 +1,6 @@
 package com.mirotest.mirotest_server.datasources.inmem;
 
+import com.mirotest.mirotest_server.PageInfo;
 import com.mirotest.mirotest_server.Widget;
 import org.junit.jupiter.api.Test;
 
@@ -8,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class SortedZWidgetsTest {
 
     void assertWs(SortedZWidgets ws, Object[] arr) {
-        assertArrayEquals(ws.toCollection().stream().map(w -> w.zIndex).toArray(), arr);
+        assertArrayEquals(arr, ws.toCollection().stream().map(w -> w.zIndex).toArray());
     }
 
     @Test
@@ -122,5 +123,55 @@ class SortedZWidgetsTest {
         assertWs(ws, new Object[]{3,5});
     }
 
+    private static SortedZWidgets createWsForPagination() {
+        var ws = new SortedZWidgets();
+        ws.add(new Widget(0));
+        ws.add(new Widget(1));
+        ws.add(new Widget(2));
 
+        ws.add(new Widget(4));
+        ws.add(new Widget(5));
+        ws.add(new Widget(6));
+        ws.add(new Widget(7));
+
+        ws.add(new Widget(9));
+        ws.add(new Widget(10));
+        return ws;
+    }
+
+    @Test
+    void paginationFirstBlock() {
+        var ws = createWsForPagination();
+        var pageInfo = new PageInfo();
+        pageInfo.itemsPerPage =2;
+        pageInfo.currentPage=1;
+        assertArrayEquals(new Object[]{0,1}, ws.toCollection(pageInfo).stream().map(w -> w.zIndex).toArray());
+    }
+
+    @Test
+    void paginationInsideBlock() {
+        var ws = createWsForPagination();
+        var pageInfo = new PageInfo();
+        pageInfo.itemsPerPage =2;
+        pageInfo.currentPage=3;
+        assertArrayEquals(new Object[]{5,6}, ws.toCollection(pageInfo).stream().map(w -> w.zIndex).toArray());
+    }
+
+    @Test
+    void paginationTwoBlocks() {
+        var ws = createWsForPagination();
+        var pageInfo = new PageInfo();
+        pageInfo.itemsPerPage =2;
+        pageInfo.currentPage=2;
+        assertArrayEquals(new Object[]{2,4}, ws.toCollection(pageInfo).stream().map(w -> w.zIndex).toArray());
+    }
+
+    @Test
+    void paginationThreeBlocks() {
+        var ws = createWsForPagination();
+        var pageInfo = new PageInfo();
+        pageInfo.itemsPerPage =8;
+        pageInfo.currentPage=1;
+        assertArrayEquals(new Object[]{0,1,2,4,5,6,7,9}, ws.toCollection(pageInfo).stream().map(w -> w.zIndex).toArray());
+    }
 }

@@ -1,5 +1,6 @@
 package com.mirotest.mirotest_server.datasources.inmem;
 
+import com.mirotest.mirotest_server.PageInfo;
 import com.mirotest.mirotest_server.Widget;
 import com.mirotest.mirotest_server.WidgetChanges;
 import com.mirotest.mirotest_server.datasources.IWidgetDataSource;
@@ -69,6 +70,18 @@ public class InMemoryWidgetSource implements IWidgetDataSource {
         rwLock.readLock().lock();
         try {
             return sortedZWidgets.toCollection();
+        }
+        finally {
+            rwLock.readLock().unlock();
+        }
+    }
+
+    @Override
+    @NonNull
+    public Collection<Widget> getSortedZWidgets(PageInfo pageInfo) {
+        rwLock.readLock().lock();
+        try {
+            return sortedZWidgets.toCollection(pageInfo);
         }
         finally {
             rwLock.readLock().unlock();

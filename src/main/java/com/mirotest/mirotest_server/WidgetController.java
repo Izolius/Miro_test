@@ -20,8 +20,19 @@ public class WidgetController {
     }
 
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Collection<Widget> widgetList() {
-        return widgetDesk.getWidgets();
+    public Collection<Widget> widgetList(
+            @RequestParam(value = "page", required = false) Integer page,
+            @RequestParam(value = "itemsPerPage", required = false) Integer itemsPerPage) {
+        if (page == null && itemsPerPage == null)
+            return widgetDesk.getWidgets();
+        else {
+            PageInfo pageInfo = new PageInfo();
+            if (page != null)
+                pageInfo.currentPage = page;
+            if (itemsPerPage != null)
+                pageInfo.itemsPerPage = itemsPerPage;
+            return widgetDesk.getWidgets(pageInfo);
+        }
     }
 
     @GetMapping(value = "/get", produces = MediaType.APPLICATION_JSON_VALUE)

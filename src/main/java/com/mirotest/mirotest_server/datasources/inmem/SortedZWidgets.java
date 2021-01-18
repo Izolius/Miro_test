@@ -1,15 +1,13 @@
 package com.mirotest.mirotest_server.datasources.inmem;
 
+import com.mirotest.mirotest_server.PageInfo;
 import com.mirotest.mirotest_server.Widget;
-import com.mirotest.mirotest_server.WidgetChanges;
+import org.springframework.lang.NonNull;
 
-import javax.management.InstanceNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.TreeMap;
-import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 
 class ConsecutiveWidgets {
     int first=0, last=-1;
@@ -173,6 +171,28 @@ public class SortedZWidgets {
         var result = new ArrayList<Widget>();
         result.ensureCapacity(totalCount);
         data.forEach((integer, consecutiveWidgets) -> result.addAll(consecutiveWidgets.toCollection()));
+        return result;
+    }
+
+    public Collection<Widget> toCollection(@NonNull PageInfo pageInfo) {
+        int startIndex = (pageInfo.currentPage - 1) * pageInfo.itemsPerPage;
+        int endIndex = startIndex + pageInfo.itemsPerPage;
+        var result = new ArrayList<Widget>();
+        result.ensureCapacity(pageInfo.itemsPerPage);
+        int passed = 0;
+        for (var entry : data.entrySet()) {
+            if (passed + entry.getValue().toCollection().size() <= startIndex) {
+                passed += entry.getValue().toCollection().size();
+                continue;
+            }
+
+            for (var widget : entry.getValue().toCollection()) {
+                if (passed >= startIndex && passed < endIndex) {
+                    result.add(widget);
+                }
+                passed++;
+            }
+        }
         return result;
     }
 }
