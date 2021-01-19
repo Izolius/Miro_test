@@ -18,6 +18,16 @@ class ConsecutiveWidgetsTest {
     }
 
     @Test
+    void addSameNegative() {
+        var cons = new ConsecutiveWidgets();
+        cons.add(new Widget(-1));
+        cons.add(new Widget(-1));
+        var widgets = cons.toArray();
+        assertEquals(-1, widgets[0].zIndex);
+        assertEquals(0, widgets[1].zIndex);
+    }
+
+    @Test
     void addSameTimeChanged() {
         var cons = new ConsecutiveWidgets();
         var first = new Widget();
