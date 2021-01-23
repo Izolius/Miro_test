@@ -1,6 +1,7 @@
 package com.mirotest.mirotest_server;
 
 import com.mirotest.mirotest_server.common.PageInfo;
+import com.mirotest.mirotest_server.common.Shape;
 import com.mirotest.mirotest_server.common.Widget;
 import com.mirotest.mirotest_server.common.WidgetChanges;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,8 @@ public class WidgetController {
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public Collection<Widget> widgetList(
             @RequestParam(value = "page", required = false) Integer page,
-            @RequestParam(value = "itemsPerPage", required = false) Integer itemsPerPage) {
+            @RequestParam(value = "itemsPerPage", required = false) Integer itemsPerPage,
+            @RequestBody(required = false) Shape filter) {
         if (page == null && itemsPerPage == null)
             return widgetDesk.getWidgets();
         else {

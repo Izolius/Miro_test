@@ -1,6 +1,7 @@
 package com.mirotest.mirotest_server;
 
 import com.mirotest.mirotest_server.common.PageInfo;
+import com.mirotest.mirotest_server.common.Shape;
 import com.mirotest.mirotest_server.common.WidgetChanges;
 import com.mirotest.mirotest_server.datasources.IWidgetDataSource;
 import com.mirotest.mirotest_server.common.Widget;
@@ -48,6 +49,11 @@ public class WidgetDesk {
     @NonNull
     public Collection<Widget> getWidgets() {
         return widgets.getSortedZWidgets();
+    }
+
+    @NonNull
+    public Collection<Widget> getWidgets(Shape filter) {
+        return widgets.getSortedZWidgets(filter);
     }
 
     @NonNull

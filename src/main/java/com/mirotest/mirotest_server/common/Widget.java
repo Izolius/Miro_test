@@ -10,6 +10,7 @@ public class Widget extends Shape {
     public final Date lastModificationTime;
     public final UUID id;
     public Widget(int zIndex) {
+        super();
         this.zIndex = zIndex;
         id = UUID.randomUUID();
         lastModificationTime = new Date();

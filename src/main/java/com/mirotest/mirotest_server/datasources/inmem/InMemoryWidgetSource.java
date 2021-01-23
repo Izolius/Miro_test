@@ -1,9 +1,11 @@
 package com.mirotest.mirotest_server.datasources.inmem;
 
 import com.mirotest.mirotest_server.common.PageInfo;
+import com.mirotest.mirotest_server.common.Shape;
 import com.mirotest.mirotest_server.common.Widget;
 import com.mirotest.mirotest_server.common.WidgetChanges;
 import com.mirotest.mirotest_server.datasources.IWidgetDataSource;
+import com.mirotest.mirotest_server.datasources.inmem.rtree.RTree;
 import org.springframework.lang.NonNull;
 
 import java.util.*;
@@ -14,6 +16,7 @@ public class InMemoryWidgetSource implements IWidgetDataSource {
     final private SortedZWidgets sortedZWidgets = new SortedZWidgets();
     final private HashMap<UUID, Widget> widgetsById = new HashMap<>();
     final private ReadWriteLock rwLock = new ReentrantReadWriteLock(true);
+    final private RTree<Widget> rTree = new RTree<>(10, 3);
 
     @Override
     @NonNull
@@ -22,6 +25,7 @@ public class InMemoryWidgetSource implements IWidgetDataSource {
         try {
             sortedZWidgets.add(widget);
             widgetsById.put(widget.id, widget);
+            rTree.insert(widget, widget);
             return widget;
         }
         finally {
@@ -36,7 +40,9 @@ public class InMemoryWidgetSource implements IWidgetDataSource {
             var widget = widgetsById.get(id);
             if (widget != null) {
                 sortedZWidgets.remove(widget);
+                rTree.delete(widget, widget);
                 WidgetChangesApplier.applyChanges(widget, changes);
+                rTree.insert(widget, widget);
                 sortedZWidgets.add(widget);
                 return widget;
             }
@@ -55,6 +61,7 @@ public class InMemoryWidgetSource implements IWidgetDataSource {
             if (widget != null) {
                 sortedZWidgets.remove(widget);
                 widgetsById.remove(widget.id);
+                rTree.delete(widget, widget);
                 return true;
             }
             return false;
@@ -93,6 +100,21 @@ public class InMemoryWidgetSource implements IWidgetDataSource {
         rwLock.readLock().lock();
         try {
             return widgetsById.get(id);
+        }
+        finally {
+            rwLock.readLock().unlock();
+        }
+    }
+
+    @Override
+    @NonNull
+    public Collection<Widget> getSortedZWidgets(Shape filter) {
+        rwLock.readLock().lock();
+        try {
+            // TODO: remove sorting
+            var result = rTree.search(filter);
+            result.sort(Comparator.comparingInt(o -> o.zIndex));
+            return result;
         }
         finally {
             rwLock.readLock().unlock();
