@@ -1,9 +1,8 @@
-package com.mirotest.mirotest_server.datasources.inmem;
+package com.mirotest.mirotest_server.datasources.inmem.rtree;
 
 import com.mirotest.mirotest_server.Shape;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
  * Implementation of an arbitrary-dimension RTree. Based on R-Trees: A Dynamic
@@ -87,12 +86,12 @@ public class RTree<T> {
         if (n.isLeaf) { //TODO: change to visitors pattern
             for (Node child : n.children) {
                 if (isOverlap(child.shape, window)) {
-                    results.add(((Entry) child).entry);
+                    results.add(((Entry<T>) child).entry);
                 }
             }
         } else {
             for (Node child : n.children) {
-                if (isOverlap(child.shape, window)) {
+                if (isPartialOverlap(child.shape, window)) {
                     search(window, child, results);
                 }
             }
@@ -110,7 +109,7 @@ public class RTree<T> {
         if (leaf == null)
             return false;
         assert (leaf.isLeaf) : "Entry is not found at leaf?!?";
-        boolean removed = leaf.children.removeIf(node -> ((Entry)node).entry.equals(entry));
+        boolean removed = leaf.children.removeIf(node -> ((Entry<T>)node).entry.equals(entry));
         assert removed;
 
         condenseTree(leaf);
@@ -128,13 +127,13 @@ public class RTree<T> {
     private Node findLeaf(Node n, Shape window, T entry) {
         if (n.isLeaf) {
             for (Node child : n.children) {
-                if (((Entry) child).entry.equals(entry)) {
+                if (((Entry<T>) child).entry.equals(entry) && isOverlap(child.shape, window)) {
                     return n;
                 }
             }
         } else {
             for (Node child : n.children) {
-                if (isOverlap(child.shape, window)) {
+                if (isPartialOverlap(child.shape, window)) {
                     Node result = findLeaf(child, window, entry);
                     if (result != null) {
                         return result;
@@ -146,18 +145,18 @@ public class RTree<T> {
     }
 
     private void condenseTree(Node leaf) {
-        LinkedList<Entry> reinsert = new LinkedList<>();
+        LinkedList<Entry<T>> reinsert = new LinkedList<>();
         Node currentNode = leaf;
         while (currentNode != root) {
             if (currentNode.children.size() < minEntries) {
                 currentNode.parent.children.remove(currentNode);
-                currentNode.VisitLeafs(reinsert::add);
+                currentNode.VisitLeafs(node -> reinsert.add((Entry<T>) node));
             } else {
                 recalcMbr(currentNode);
             }
             currentNode = currentNode.parent;
         }
-        for (Entry node : reinsert) {
+        for (Entry<T> node : reinsert) {
             insert(node.shape, node.entry);
         }
     }
@@ -177,11 +176,12 @@ public class RTree<T> {
      * @param entry      the entry to insert
      */
     public void insert(Shape shape, T entry) {
-        Entry e = new Entry(shape, entry);
+        Entry<T> e = new Entry<>(shape, entry);
         Node l = chooseLeaf(root, e);
         l.children.add(e);
         size++;
         e.parent = l;
+        recalcMbr(l);
         if (l.children.size() > maxEntries) {
             Node right = splitNode(l);
             adjustTree(l, right);
@@ -200,7 +200,7 @@ public class RTree<T> {
         // For instance the call at the end of the "while (!cc.isEmpty())" loop
         // could be modified and inlined because it's only adjusting for the addition
         // of a single node.  Left as-is for now for readability.
-        Node right = new Node();
+        Node right = new Node(splittedNode.isLeaf);
         right.parent = splittedNode.parent;
         if (splittedNode.parent != null)
             right.parent.children.add(right);
@@ -212,10 +212,12 @@ public class RTree<T> {
         while (!children.isEmpty()) {
             if (right.children.size() + children.size() == minEntries) {
                 right.children.addAll(children);
+                children.forEach(n -> n.parent = right);
                 recalcMbr(right);
                 break;
             } else if (splittedNode.children.size() + children.size() == minEntries) {
                 splittedNode.children.addAll(children);
+                children.forEach(n -> n.parent = splittedNode);
                 recalcMbr(splittedNode);
                 break;
             }
@@ -248,6 +250,7 @@ public class RTree<T> {
                 }
             }
             preferred.children.add(choosen);
+            choosen.parent = preferred;
             recalcMbr(preferred.shape, choosen);
         }
         return right;
@@ -263,9 +266,10 @@ public class RTree<T> {
                 right.parent = root;
                 recalcMbr(root);
             } else {
-                if (left.parent.children.size() > maxEntries) {
-                    var newRight = splitNode(left.parent);
-                    adjustTree(left.parent, newRight);
+                var curRoot = left.parent;
+                if (curRoot.children.size() > maxEntries) {
+                    var newRight = splitNode(curRoot);
+                    adjustTree(curRoot, newRight);
                 }
             }
         } else {
@@ -292,7 +296,7 @@ public class RTree<T> {
                 maxx = Math.max(node1.shape.coord.x + node1.shape.width, node2.shape.coord.x + node2.shape.width);
                 maxy = Math.max(node1.shape.coord.y + node1.shape.height, node2.shape.coord.y + node2.shape.height);
 
-                int waste = (maxx - minx) * (maxy - miny) - node1Area - node2Area;
+                int waste = Math.abs(maxx - minx) * Math.abs(maxy - miny) - node1Area - node2Area;
                 if (waste > maxWaste) {
                     maxWaste = waste;
                     left = node1;
@@ -304,7 +308,11 @@ public class RTree<T> {
         nn.remove(right);
 
         leftNode.children.add(left);
+        left.parent = leftNode;
+        recalcMbr(leftNode);
         rightNode.children.add(right);
+        right.parent = rightNode;
+        recalcMbr(rightNode);
     }
 
     /**
@@ -367,17 +375,13 @@ public class RTree<T> {
             maxy = Math.max(maxy, coord.y + shape.height);
         }
 
-        if (node.shape == null)
-            node.shape = new Shape(minx, miny, maxx - minx, maxy - miny);
-        else {
-            node.shape.coord.x = minx;
-            node.shape.coord.y = miny;
-            node.shape.width = maxx - minx;
-            node.shape.height = maxy - miny;
-        }
+        node.shape.coord.x = minx;
+        node.shape.coord.y = miny;
+        node.shape.width = maxx - minx;
+        node.shape.height = maxy - miny;
     }
 
-    private Node chooseLeaf(Node curRoot, Entry entry) {
+    private Node chooseLeaf(Node curRoot, Entry<T> entry) {
         if (curRoot.isLeaf) {
             return curRoot;
         }
@@ -425,48 +429,23 @@ public class RTree<T> {
         return shape.coord.y + shape.height <= window.coord.y + window.height;
     }
 
-    private class Node {
-        Shape shape;
-        final LinkedList<Node> children = new LinkedList<>();
-        final boolean isLeaf;
-
-        Node parent;
-
-        public Node(Shape shape, boolean leaf) {
-            this.shape = new Shape(shape);
-            this.isLeaf = leaf;
+    private boolean isPartialOverlap(Shape shape,
+                              Shape window) {
+        if (window.coord.x < shape.coord.x) {
+            if (shape.coord.x > window.coord.x + window.width)
+                return false;
+        } else if (window.coord.x > shape.coord.x) {
+            if (shape.coord.x + shape.width < window.coord.x)
+                return false;
         }
 
-        public Node() {
-            this.isLeaf = false;
+        if (window.coord.y < shape.coord.y) {
+            return shape.coord.y <= window.coord.y + window.height;
+        } else if (window.coord.y > shape.coord.y) {
+            return shape.coord.y + shape.height >= window.coord.y;
         }
-
-        public void VisitLeafs(Consumer<Entry> visitor) {
-            for (Node child : children) {
-                child.VisitLeafs(visitor);
-            }
-        }
-
+        return true;
     }
 
-    private class Entry extends Node {
-        final T entry;
 
-        public Entry(Shape shape, T entry) {
-            // an entry isn't actually a leaf (its parent is a leaf)
-            // but all the algorithms should stop at the first leaf they encounter,
-            // so this little hack shouldn't be a problem.
-            super(shape, true);
-            this.entry = entry;
-        }
-
-        @Override
-        public void VisitLeafs(Consumer<Entry> visitor) {
-            visitor.accept(this);
-        }
-
-        public String toString() {
-            return "Entry: " + entry;
-        }
-    }
 }

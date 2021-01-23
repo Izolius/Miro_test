@@ -95,7 +95,7 @@ class ConsecutiveWidgets {
 }
 
 public class SortedZWidgets {
-    private TreeMap<Integer, ConsecutiveWidgets> data = new TreeMap<>();
+    private final TreeMap<Integer, ConsecutiveWidgets> data = new TreeMap<>();
     private int totalCount;
 
     public void add(Widget widget) {

@@ -10,7 +10,7 @@ import java.util.UUID;
 @RestController
 public class WidgetController {
 
-    private WidgetDesk widgetDesk;
+    private final WidgetDesk widgetDesk;
     WidgetController(@Autowired WidgetDesk widgetDesk) {
         this.widgetDesk = widgetDesk;
     }

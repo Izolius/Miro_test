@@ -3,8 +3,6 @@ package com.mirotest.mirotest_server.datasources.inmem;
 import com.mirotest.mirotest_server.Widget;
 import com.mirotest.mirotest_server.WidgetChanges;
 
-import java.util.Date;
-
 public class WidgetChangesApplier {
 
     public static void applyChanges(Widget widget, WidgetChanges changes) {

@@ -6,14 +6,13 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
 
 @Component
 public class WidgetDesk {
 
-    IWidgetDataSource widgets;
+    private final IWidgetDataSource widgets;
 
     public WidgetDesk(@Autowired IWidgetDataSource widgets) {
         this.widgets = widgets;

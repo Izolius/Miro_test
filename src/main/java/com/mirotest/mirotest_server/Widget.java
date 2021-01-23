@@ -1,13 +1,12 @@
 package com.mirotest.mirotest_server;
-import java.awt.*;
-import java.awt.geom.Point2D;
+
 import java.util.Date;
 import java.util.UUID;
 
 public class Widget extends Shape {
     public int zIndex;
-    public Date lastModificationTime;
-    public UUID id;
+    public final Date lastModificationTime;
+    public final UUID id;
     public Widget(int zIndex) {
         this.zIndex = zIndex;
         id = UUID.randomUUID();
