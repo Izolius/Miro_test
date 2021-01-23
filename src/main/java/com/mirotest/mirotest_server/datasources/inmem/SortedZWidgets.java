@@ -11,7 +11,7 @@ public class SortedZWidgets {
 
     public void add(Widget widget) {
         int insertIndex = Collections.binarySearch(sortedWidgets, widget, Comparator.comparingInt(o -> o.zIndex));
-        if (insertIndex > 0) {
+        if (insertIndex >= 0) {
             var iter = sortedWidgets.listIterator(insertIndex);
             iter.add(widget);
             shift(iter, widget);
@@ -60,7 +60,7 @@ public class SortedZWidgets {
 
     public Collection<Widget> toCollection(@NonNull PageInfo pageInfo) {
         int startIndex = (pageInfo.currentPage - 1) * pageInfo.itemsPerPage;
-        int endIndex = startIndex + pageInfo.itemsPerPage;
+        int endIndex = Math.min(startIndex + pageInfo.itemsPerPage, sortedWidgets.size());
         return new ArrayList<>(sortedWidgets.subList(startIndex, endIndex));
     }
 }

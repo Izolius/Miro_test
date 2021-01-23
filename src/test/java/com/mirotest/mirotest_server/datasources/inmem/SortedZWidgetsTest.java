@@ -174,4 +174,13 @@ class SortedZWidgetsTest {
         pageInfo.currentPage=1;
         assertArrayEquals(new Object[]{0,1,2,4,5,6,7,9}, ws.toCollection(pageInfo).stream().map(w -> w.zIndex).toArray());
     }
+
+    @Test
+    void notFullLastPage() {
+        var ws = createWsForPagination();
+        var pageInfo = new PageInfo();
+        pageInfo.itemsPerPage =4;
+        pageInfo.currentPage=3;
+        assertArrayEquals(new Object[]{10}, ws.toCollection(pageInfo).stream().map(w -> w.zIndex).toArray());
+    }
 }
