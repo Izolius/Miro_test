@@ -71,7 +71,7 @@ class WidgetDeskTest {
         second.height = 1;
         desk.addWidget(second);
 
-        assertEquals(second, desk.getWidgets(new Shape(2,2,1,1)).toArray()[0]);
+        assertArrayEquals(new Object[]{second}, desk.getWidgets(new Shape(2,2,1,1)).toArray());
     }
 
 
