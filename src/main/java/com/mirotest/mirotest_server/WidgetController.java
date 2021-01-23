@@ -1,5 +1,8 @@
 package com.mirotest.mirotest_server;
 
+import com.mirotest.mirotest_server.common.PageInfo;
+import com.mirotest.mirotest_server.common.Widget;
+import com.mirotest.mirotest_server.common.WidgetChanges;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;

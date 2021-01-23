@@ -1,8 +1,8 @@
 package com.mirotest.mirotest_server.datasources;
 
-import com.mirotest.mirotest_server.PageInfo;
-import com.mirotest.mirotest_server.Widget;
-import com.mirotest.mirotest_server.WidgetChanges;
+import com.mirotest.mirotest_server.common.PageInfo;
+import com.mirotest.mirotest_server.common.Widget;
+import com.mirotest.mirotest_server.common.WidgetChanges;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 

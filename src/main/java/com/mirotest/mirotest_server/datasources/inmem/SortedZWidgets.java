@@ -1,7 +1,7 @@
 package com.mirotest.mirotest_server.datasources.inmem;
 
-import com.mirotest.mirotest_server.PageInfo;
-import com.mirotest.mirotest_server.Widget;
+import com.mirotest.mirotest_server.common.PageInfo;
+import com.mirotest.mirotest_server.common.Widget;
 import org.springframework.lang.NonNull;
 
 import java.util.ArrayList;

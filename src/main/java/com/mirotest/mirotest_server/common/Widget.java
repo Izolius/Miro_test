@@ -1,4 +1,6 @@
-package com.mirotest.mirotest_server;
+package com.mirotest.mirotest_server.common;
+
+import com.mirotest.mirotest_server.CreateWidgetParams;
 
 import java.util.Date;
 import java.util.UUID;

@@ -1,6 +1,6 @@
 package com.mirotest.mirotest_server.datasources.inmem;
 
-import com.mirotest.mirotest_server.Widget;
+import com.mirotest.mirotest_server.common.Widget;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

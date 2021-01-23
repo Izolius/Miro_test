@@ -1,5 +1,7 @@
 package com.mirotest.mirotest_server;
 
+import com.mirotest.mirotest_server.common.Widget;
+import com.mirotest.mirotest_server.common.WidgetChanges;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

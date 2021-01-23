@@ -1,4 +1,4 @@
-package com.mirotest.mirotest_server;
+package com.mirotest.mirotest_server.common;
 
 import java.awt.*;
 

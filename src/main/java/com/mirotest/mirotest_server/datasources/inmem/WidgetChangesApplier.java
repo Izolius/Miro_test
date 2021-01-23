@@ -1,7 +1,7 @@
 package com.mirotest.mirotest_server.datasources.inmem;
 
-import com.mirotest.mirotest_server.Widget;
-import com.mirotest.mirotest_server.WidgetChanges;
+import com.mirotest.mirotest_server.common.Widget;
+import com.mirotest.mirotest_server.common.WidgetChanges;
 
 public class WidgetChangesApplier {
 
