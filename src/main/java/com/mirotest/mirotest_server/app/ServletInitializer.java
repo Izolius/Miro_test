@@ -1,4 +1,4 @@
-package com.mirotest.mirotest_server;
+package com.mirotest.mirotest_server.app;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;

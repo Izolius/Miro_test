@@ -1,5 +1,6 @@
-package com.mirotest.mirotest_server;
+package com.mirotest.mirotest_server.app;
 
+import com.mirotest.mirotest_server.app.WidgetDesk;
 import com.mirotest.mirotest_server.common.Shape;
 import com.mirotest.mirotest_server.common.Widget;
 import com.mirotest.mirotest_server.common.WidgetChanges;

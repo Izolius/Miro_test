@@ -1,4 +1,4 @@
-package com.mirotest.mirotest_server;
+package com.mirotest.mirotest_server.app;
 
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;

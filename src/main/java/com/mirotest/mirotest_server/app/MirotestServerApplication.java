@@ -1,4 +1,4 @@
-package com.mirotest.mirotest_server;
+package com.mirotest.mirotest_server.app;
 
 import com.mirotest.mirotest_server.datasources.IWidgetDataSource;
 import com.mirotest.mirotest_server.datasources.inmem.InMemoryWidgetSource;
