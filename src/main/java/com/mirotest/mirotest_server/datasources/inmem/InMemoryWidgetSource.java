@@ -111,8 +111,9 @@ public class InMemoryWidgetSource implements IWidgetDataSource {
     public Collection<Widget> getSortedZWidgets(Shape filter) {
         rwLock.readLock().lock();
         try {
-            // TODO: remove sorting
+            // Time complexity is log(n) for filtering (O(n) in worse case)
             var result = rTree.search(filter);
+            // Time complexity is m*log(m). Can be optimized to m*log(k), k<m. Price is memory
             result.sort(Comparator.comparingInt(o -> o.zIndex));
             return result;
         }
