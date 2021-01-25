@@ -55,8 +55,7 @@ class WidgetControllerTest {
         mockMvc.perform(post("/create").content(asJsonString(req)).contentType(MediaType.APPLICATION_JSON));
         mockMvc.perform(post("/create").content(asJsonString(req)).contentType(MediaType.APPLICATION_JSON));
         mockMvc.perform(post("/create").content(asJsonString(req)).contentType(MediaType.APPLICATION_JSON));
-
-        mockMvc.perform(get("/list").param("page","2").param("itemsPerPage","2").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/list").content("{ \"pageInfo\": { \"currentPage\": 2, \"itemsPerPage\": 2 } }").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("[{zIndex=3}]", false));
     }
 

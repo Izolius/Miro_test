@@ -1,7 +1,5 @@
 package com.mirotest.mirotest_server.app;
 
-import com.mirotest.mirotest_server.common.PageInfo;
-import com.mirotest.mirotest_server.common.Shape;
 import com.mirotest.mirotest_server.common.Widget;
 import com.mirotest.mirotest_server.common.WidgetChanges;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,19 +22,17 @@ public class WidgetController {
     }
 
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Collection<Widget> widgetList(
-            @RequestParam(value = "page", required = false) Integer page,
-            @RequestParam(value = "itemsPerPage", required = false) Integer itemsPerPage,
-            @RequestBody(required = false) Shape filter) {
-        if (page == null && itemsPerPage == null)
+    public Collection<Widget> widgetList(@RequestBody Endpoint endpoint) {
+        if (endpoint == null || endpoint.pageInfo == null && endpoint.filter == null)
             return widgetDesk.getWidgets();
         else {
-            PageInfo pageInfo = new PageInfo();
-            if (page != null)
-                pageInfo.currentPage = page;
-            if (itemsPerPage != null)
-                pageInfo.itemsPerPage = itemsPerPage;
-            return widgetDesk.getWidgets(pageInfo);
+            if (endpoint.pageInfo != null && endpoint.filter == null) {
+                return widgetDesk.getWidgets(endpoint.pageInfo);
+            } else if (endpoint.pageInfo == null) {
+                return widgetDesk.getWidgets(endpoint.filter);
+            } else {
+                return widgetDesk.getWidgets(endpoint.filter, endpoint.pageInfo);
+            }
         }
     }
 

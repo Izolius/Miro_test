@@ -1,6 +1,7 @@
 package com.mirotest.mirotest_server.datasources.inmem;
 
 import com.mirotest.mirotest_server.common.PageInfo;
+import com.mirotest.mirotest_server.common.Paginator;
 import com.mirotest.mirotest_server.common.Widget;
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class SortedZWidgetsTest {
 
     void assertWs(SortedZWidgets ws, Object[] arr) {
-        assertArrayEquals(arr, ws.toCollection().stream().map(w -> w.zIndex).toArray());
+        assertArrayEquals(arr, ws.toList().stream().map(w -> w.zIndex).toArray());
     }
 
     @Test
@@ -145,7 +146,7 @@ class SortedZWidgetsTest {
         var pageInfo = new PageInfo();
         pageInfo.itemsPerPage =2;
         pageInfo.currentPage=1;
-        assertArrayEquals(new Object[]{0,1}, ws.toCollection(pageInfo).stream().map(w -> w.zIndex).toArray());
+        assertArrayEquals(new Object[]{0,1}, Paginator.paginate(ws.toList(), pageInfo).stream().map(w -> w.zIndex).toArray());
     }
 
     @Test
@@ -154,7 +155,7 @@ class SortedZWidgetsTest {
         var pageInfo = new PageInfo();
         pageInfo.itemsPerPage =2;
         pageInfo.currentPage=3;
-        assertArrayEquals(new Object[]{5,6}, ws.toCollection(pageInfo).stream().map(w -> w.zIndex).toArray());
+        assertArrayEquals(new Object[]{5,6}, Paginator.paginate(ws.toList(), pageInfo).stream().map(w -> w.zIndex).toArray());
     }
 
     @Test
@@ -163,7 +164,7 @@ class SortedZWidgetsTest {
         var pageInfo = new PageInfo();
         pageInfo.itemsPerPage =2;
         pageInfo.currentPage=2;
-        assertArrayEquals(new Object[]{2,4}, ws.toCollection(pageInfo).stream().map(w -> w.zIndex).toArray());
+        assertArrayEquals(new Object[]{2,4}, Paginator.paginate(ws.toList(), pageInfo).stream().map(w -> w.zIndex).toArray());
     }
 
     @Test
@@ -172,7 +173,7 @@ class SortedZWidgetsTest {
         var pageInfo = new PageInfo();
         pageInfo.itemsPerPage =8;
         pageInfo.currentPage=1;
-        assertArrayEquals(new Object[]{0,1,2,4,5,6,7,9}, ws.toCollection(pageInfo).stream().map(w -> w.zIndex).toArray());
+        assertArrayEquals(new Object[]{0,1,2,4,5,6,7,9}, Paginator.paginate(ws.toList(), pageInfo).stream().map(w -> w.zIndex).toArray());
     }
 
     @Test
@@ -181,6 +182,6 @@ class SortedZWidgetsTest {
         var pageInfo = new PageInfo();
         pageInfo.itemsPerPage =4;
         pageInfo.currentPage=3;
-        assertArrayEquals(new Object[]{10}, ws.toCollection(pageInfo).stream().map(w -> w.zIndex).toArray());
+        assertArrayEquals(new Object[]{10}, Paginator.paginate(ws.toList(), pageInfo).stream().map(w -> w.zIndex).toArray());
     }
 }

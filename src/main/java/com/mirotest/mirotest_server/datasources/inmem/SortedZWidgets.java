@@ -1,8 +1,6 @@
 package com.mirotest.mirotest_server.datasources.inmem;
 
-import com.mirotest.mirotest_server.common.PageInfo;
 import com.mirotest.mirotest_server.common.Widget;
-import org.springframework.lang.NonNull;
 
 import java.util.*;
 
@@ -54,13 +52,7 @@ public class SortedZWidgets {
         return true;
     }
 
-    public Collection<Widget> toCollection() {
+    public List<Widget> toList() {
         return sortedWidgets;
-    }
-
-    public Collection<Widget> toCollection(@NonNull PageInfo pageInfo) {
-        int startIndex = (pageInfo.currentPage - 1) * pageInfo.itemsPerPage;
-        int endIndex = Math.min(startIndex + pageInfo.itemsPerPage, sortedWidgets.size());
-        return new ArrayList<>(sortedWidgets.subList(startIndex, endIndex));
     }
 }

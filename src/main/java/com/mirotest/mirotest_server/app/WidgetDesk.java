@@ -61,6 +61,11 @@ public class WidgetDesk {
         return widgets.getSortedZWidgets(pageInfo);
     }
 
+    @NonNull
+    public Collection<Widget> getWidgets(Shape filter, PageInfo pageInfo) {
+        return widgets.getSortedZWidgets(filter, pageInfo);
+    }
+
     @Nullable
     public Widget getWidget(UUID id) {
         return widgets.getWidget(id);

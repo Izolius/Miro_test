@@ -1,9 +1,6 @@
 package com.mirotest.mirotest_server.datasources.inmem;
 
-import com.mirotest.mirotest_server.common.PageInfo;
-import com.mirotest.mirotest_server.common.Shape;
-import com.mirotest.mirotest_server.common.Widget;
-import com.mirotest.mirotest_server.common.WidgetChanges;
+import com.mirotest.mirotest_server.common.*;
 import com.mirotest.mirotest_server.datasources.IWidgetDataSource;
 import com.mirotest.mirotest_server.datasources.inmem.rtree.RTree;
 import org.springframework.lang.NonNull;
@@ -76,7 +73,7 @@ public class InMemoryWidgetSource implements IWidgetDataSource {
     public Collection<Widget> getSortedZWidgets() {
         rwLock.readLock().lock();
         try {
-            return sortedZWidgets.toCollection();
+            return sortedZWidgets.toList();
         }
         finally {
             rwLock.readLock().unlock();
@@ -88,7 +85,7 @@ public class InMemoryWidgetSource implements IWidgetDataSource {
     public Collection<Widget> getSortedZWidgets(PageInfo pageInfo) {
         rwLock.readLock().lock();
         try {
-            return sortedZWidgets.toCollection(pageInfo);
+            return Paginator.paginate(sortedZWidgets.toList(), pageInfo);
         }
         finally {
             rwLock.readLock().unlock();
@@ -116,6 +113,21 @@ public class InMemoryWidgetSource implements IWidgetDataSource {
             // Time complexity is m*log(m). Can be optimized to m*log(k), k<m. Price is memory
             result.sort(Comparator.comparingInt(o -> o.zIndex));
             return result;
+        }
+        finally {
+            rwLock.readLock().unlock();
+        }
+    }
+
+    @Override
+    public Collection<Widget> getSortedZWidgets(Shape filter, PageInfo pageInfo) {
+        rwLock.readLock().lock();
+        try {
+            var result = rTree.search(filter);
+            // Time complexity is m*log(m). Can be optimized to m*log(k), k<m. Price is memory
+            // Sorting can be optimized with page Info (for first pages) if store sorted by Z-index widgets in RTree nodes, but in strange use case
+            result.sort(Comparator.comparingInt(o -> o.zIndex));
+            return Paginator.paginate(result, pageInfo);
         }
         finally {
             rwLock.readLock().unlock();

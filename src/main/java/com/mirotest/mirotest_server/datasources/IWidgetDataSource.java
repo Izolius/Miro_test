@@ -28,5 +28,8 @@ public interface IWidgetDataSource {
     @NonNull
     Collection<Widget> getSortedZWidgets(Shape filter);
 
+    @NonNull
+    Collection<Widget> getSortedZWidgets(Shape filter, PageInfo pageInfo);
+
     Widget getWidget(UUID id);
 }
