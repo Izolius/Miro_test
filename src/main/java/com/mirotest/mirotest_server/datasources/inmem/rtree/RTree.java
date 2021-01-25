@@ -235,7 +235,7 @@ public class RTree<T> {
     }
 
     // Implementation of Quadratic PickSeeds
-    private void qPickSeeds(LinkedList<Node<T>> nn, Node<T> leftNode, Node<T> rightNode) { // TODO: create Pair class
+    private void qPickSeeds(LinkedList<Node<T>> nn, Node<T> leftNode, Node<T> rightNode) {
         Node<T> left = null, right = null;
         int maxWaste = -1;
         for (Node<T> node1 : nn) {
