@@ -110,7 +110,7 @@ public class InMemoryWidgetSource implements IWidgetDataSource {
         try {
             // Time complexity is log(n) for filtering (O(n) in worse case)
             var result = rTree.search(filter);
-            // Time complexity is m*log(m). Can be optimized to m*log(k), k<m. Price is memory
+            // Time complexity is m*log(m). Can be optimized to m*log(k), k<m if store sorted by Z-index widgets in RTree nodes
             result.sort(Comparator.comparingInt(o -> o.zIndex));
             return result;
         }
