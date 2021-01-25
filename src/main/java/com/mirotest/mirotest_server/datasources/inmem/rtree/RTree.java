@@ -5,21 +5,14 @@ import com.mirotest.mirotest_server.common.Shape;
 import java.util.*;
 
 /**
- * Implementation of an arbitrary-dimension RTree. Based on R-Trees: A Dynamic
- * Index Structure for Spatial Searching (Antonn Guttmann, 1984)
- * <p>
- * This class is not thread-safe.
- * <p>
- * Copyright 2010 Russ Weeks rweeks@newbrightidea.com Licensed under the GNU
- * LGPL License details here: http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- * @param <T> the type of entry to store in this RTree.
+ * RTree based on https://github.com/rweeks/util and http://www.bowdoin.edu/~ltoma/teaching/cs340/spring08/Papers/Rtree-chap1.pdf
+ * @param <T>
  */
 public class RTree<T> {
     private final int maxEntries;
     private final int minEntries;
 
-    private Node root;
+    private Node<T> root;
 
     private int size;
 
@@ -36,42 +29,16 @@ public class RTree<T> {
         root = buildRoot(true);
     }
 
-    private Node buildRoot(boolean asLeaf) {
-        return new Node(new Shape(), asLeaf);
+    public RTree(){
+        this(50,3);
+    }
+
+    private Node<T> buildRoot(boolean asLeaf) {
+        return new Node<>(new Shape(), asLeaf);
     }
 
     /**
-     * Builds a new RTree using default parameters: maximum 50 entries per node
-     * minimum 2 entries per node 2 dimensions
-     */
-    public RTree() {
-        this(50, 2);
-    }
-
-    /**
-     * @return the maximum number of entries per node
-     */
-    public int getMaxEntries() {
-        return maxEntries;
-    }
-
-    /**
-     * @return the minimum number of entries per node for all nodes except the
-     * root.
-     */
-    public int getMinEntries() {
-        return minEntries;
-    }
-
-    /**
-     * @return the number of items in this tree.
-     */
-    public int size() {
-        return size;
-    }
-
-    /**
-     * Searches the RTree for objects overlapping with the given rectangle.
+     * Searches the RTree for objects entirely in the given rectangle.
      * @return a list of objects whose rectangles overlap with the given
      * rectangle.
      */
@@ -81,16 +48,16 @@ public class RTree<T> {
         return results;
     }
 
-    private void search(Shape window, Node n,
+    private void search(Shape window, Node<T> n,
                         LinkedList<T> results) {
         if (n.isLeaf) { //TODO: change to visitors pattern
-            for (Node child : n.children) {
+            for (Node<T> child : n.children) {
                 if (isOverlap(child.shape, window)) {
                     results.add(((Entry<T>) child).entry);
                 }
             }
         } else {
-            for (Node child : n.children) {
+            for (Node<T> child : n.children) {
                 if (isPartialOverlap(child.shape, window)) {
                     search(window, child, results);
                 }
@@ -105,7 +72,7 @@ public class RTree<T> {
      * @return true iff the entry was deleted from the RTree.
      */
     public boolean delete(Shape window, T entry) {
-        Node leaf = findLeaf(root, window, entry);
+        Node<T> leaf = findLeaf(root, window, entry);
         if (leaf == null)
             return false;
         assert (leaf.isLeaf) : "Entry is not found at leaf?!?";
@@ -124,17 +91,17 @@ public class RTree<T> {
         return true;
     }
 
-    private Node findLeaf(Node n, Shape window, T entry) {
+    private Node<T> findLeaf(Node<T> n, Shape window, T entry) {
         if (n.isLeaf) {
-            for (Node child : n.children) {
+            for (Node<T> child : n.children) {
                 if (((Entry<T>) child).entry.equals(entry) && isOverlap(child.shape, window)) {
                     return n;
                 }
             }
         } else {
-            for (Node child : n.children) {
+            for (Node<T> child : n.children) {
                 if (isPartialOverlap(child.shape, window)) {
-                    Node result = findLeaf(child, window, entry);
+                    Node<T> result = findLeaf(child, window, entry);
                     if (result != null) {
                         return result;
                     }
@@ -144,13 +111,13 @@ public class RTree<T> {
         return null;
     }
 
-    private void condenseTree(Node leaf) {
+    private void condenseTree(Node<T> leaf) {
         LinkedList<Entry<T>> reinsert = new LinkedList<>();
-        Node currentNode = leaf;
+        Node<T> currentNode = leaf;
         while (currentNode != root) {
             if (currentNode.children.size() < minEntries) {
                 currentNode.parent.children.remove(currentNode);
-                currentNode.VisitLeafs(node -> reinsert.add((Entry<T>) node));
+                currentNode.VisitLeaves(reinsert::add);
             } else {
                 recalcMbr(currentNode);
             }
@@ -162,28 +129,20 @@ public class RTree<T> {
     }
 
     /**
-     * Empties the RTree
-     */
-    public void clear() {
-        root = buildRoot(true);
-        // let the GC take care of the rest.
-    }
-
-    /**
      * Inserts the given entry into the RTree, associated with the given
      * rectangle.
      *
-     * @param entry      the entry to insert
+     * @param entry the entry to insert
      */
     public void insert(Shape shape, T entry) {
         Entry<T> e = new Entry<>(shape, entry);
-        Node l = chooseLeaf(root, e);
+        Node<T> l = chooseLeaf(root, e);
         l.children.add(e);
         size++;
         e.parent = l;
         recalcMbr(l);
         if (l.children.size() > maxEntries) {
-            Node right = splitNode(l);
+            Node<T> right = splitNode(l);
             adjustTree(l, right);
         } else {
             adjustTree(l, null);
@@ -195,17 +154,13 @@ public class RTree<T> {
      * @param splittedNode node for split. Will be changed
      * @return new Node
      */
-    private Node splitNode(Node splittedNode) {
-        // TODO: this class probably calls "tighten" a little too often.
-        // For instance the call at the end of the "while (!cc.isEmpty())" loop
-        // could be modified and inlined because it's only adjusting for the addition
-        // of a single node.  Left as-is for now for readability.
-        Node right = new Node(splittedNode.isLeaf);
+    private Node<T> splitNode(Node<T> splittedNode) {
+        Node<T> right = new Node<>(splittedNode.isLeaf);
         right.parent = splittedNode.parent;
         if (splittedNode.parent != null)
             right.parent.children.add(right);
 
-        LinkedList<Node> children = new LinkedList<>(splittedNode.children);
+        LinkedList<Node<T>> children = new LinkedList<>(splittedNode.children);
         splittedNode.children.clear();
         qPickSeeds(children, splittedNode, right);
 
@@ -221,8 +176,8 @@ public class RTree<T> {
                 recalcMbr(splittedNode);
                 break;
             }
-            Node choosen = qPickNext(children, splittedNode, right);
-            Node preferred;
+            Node<T> choosen = qPickNext(children, splittedNode, right);
+            Node<T> preferred;
             int e0 = getRequiredExpansion(splittedNode.shape, choosen);
             int e1 = getRequiredExpansion(right.shape, choosen);
             if (e0 < e1) {
@@ -256,7 +211,7 @@ public class RTree<T> {
         return right;
     }
 
-    private void adjustTree(Node left, Node right) {
+    private void adjustTree(Node<T> left, Node<T> right) {
         if (right != null) {
             if (left == root) {
                 root = buildRoot(false);
@@ -280,11 +235,11 @@ public class RTree<T> {
     }
 
     // Implementation of Quadratic PickSeeds
-    private void qPickSeeds(LinkedList<Node> nn, Node leftNode, Node rightNode) { // TODO: create Pair class
-        Node left = null, right = null;
+    private void qPickSeeds(LinkedList<Node<T>> nn, Node<T> leftNode, Node<T> rightNode) { // TODO: create Pair class
+        Node<T> left = null, right = null;
         int maxWaste = -1;
-        for (Node node1 : nn) {
-            for (Node node2 : nn) {
+        for (Node<T> node1 : nn) {
+            for (Node<T> node2 : nn) {
                 if (node1 == node2) continue;
                 int node1Area = getArea(node1.shape);
                 int node2Area = getArea(node2.shape);
@@ -322,10 +277,10 @@ public class RTree<T> {
      * @param left the candidate nodes for the children to be added to.
      * @param right the candidate nodes for the children to be added to.
      */
-    private Node qPickNext(LinkedList<Node> cc, Node left, Node right) {
+    private Node<T> qPickNext(LinkedList<Node<T>> cc, Node<T> left, Node<T> right) {
         int maxDiff = -1;
-        Node nextC = null;
-        for (Node c : cc) {
+        Node<T> nextC = null;
+        for (Node<T> c : cc) {
             int n0Exp = getRequiredExpansion(left.shape, c);
             int n1Exp = getRequiredExpansion(right.shape, c);
             int diff = Math.abs(n1Exp - n0Exp);
@@ -339,7 +294,7 @@ public class RTree<T> {
         return nextC;
     }
 
-    private void recalcMbr(Shape shape, Node newChild) {
+    private void recalcMbr(Shape shape, Node<T> newChild) {
         int minx, miny, maxx, maxy;
 
         var coord = shape.coord;
@@ -358,13 +313,13 @@ public class RTree<T> {
     }
 
 
-    private void recalcMbr(Node node) {
+    private void recalcMbr(Node<T> node) {
         assert (node.children.size() > 0) : "recalcShape() called on empty node!";
         int minx, miny, maxx, maxy;
         minx = miny = Integer.MAX_VALUE;
         maxx = maxy = Integer.MIN_VALUE;
 
-        for (Node child : node.children) {
+        for (Node<T> child : node.children) {
             var shape = child.shape;
             var coord = shape.coord;
 
@@ -381,13 +336,13 @@ public class RTree<T> {
         node.shape.height = maxy - miny;
     }
 
-    private Node chooseLeaf(Node curRoot, Entry<T> entry) {
+    private Node<T> chooseLeaf(Node<T> curRoot, Entry<T> entry) {
         if (curRoot.isLeaf) {
             return curRoot;
         }
         int minInc = Integer.MAX_VALUE;
-        Node next = curRoot.children.get(0);
-        for (Node child : curRoot.children) {
+        Node<T> next = curRoot.children.get(0);
+        for (Node<T> child : curRoot.children) {
             int inc = getRequiredExpansion(child.shape, entry);
             if (inc < minInc) {
                 minInc = inc;
@@ -407,7 +362,7 @@ public class RTree<T> {
      * Returns the increase in area necessary for the given rectangle to cover the
      * given entry.
      */
-    private int getRequiredExpansion(Shape shape, Node e) {
+    private int getRequiredExpansion(Shape shape, Node<T> e) {
         int area = getArea(shape);
         var tmp = new Shape(shape);
         recalcMbr(tmp, e);

@@ -5,12 +5,12 @@ import com.mirotest.mirotest_server.common.Shape;
 import java.util.LinkedList;
 import java.util.function.Consumer;
 
-class Node {
-    final Shape shape;
-    final LinkedList<Node> children = new LinkedList<>();
+class Node<T> {
+    final Shape shape; // only dependency from common package
+    final LinkedList<Node<T>> children = new LinkedList<>();
     final boolean isLeaf;
 
-    Node parent;
+    Node<T> parent;
 
     public Node(Shape shape, boolean leaf) {
         this.shape = new Shape(shape);
@@ -27,15 +27,15 @@ class Node {
         this.shape = new Shape();
     }
 
-    public <T> void VisitLeafs(Consumer<Entry<T>> visitor) {
-        for (Node child : children) {
-            child.VisitLeafs(visitor);
+    public void VisitLeaves(Consumer<Entry<T>> visitor) {
+        for (Node<T> child : children) {
+            child.VisitLeaves(visitor);
         }
     }
 
 }
 
-class Entry<T> extends Node {
+class Entry<T> extends Node<T> {
     final T entry;
 
     public Entry(Shape shape, T entry) {
@@ -47,8 +47,8 @@ class Entry<T> extends Node {
     }
 
     @Override
-    public <E> void VisitLeafs(Consumer<Entry<E>> visitor) {
-        visitor.accept((Entry<E>) this);
+    public void VisitLeaves(Consumer<Entry<T>> visitor) {
+        visitor.accept(this);
     }
 
     public String toString() {

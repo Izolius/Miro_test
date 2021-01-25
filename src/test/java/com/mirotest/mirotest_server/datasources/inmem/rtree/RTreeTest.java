@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class RTreeTest {
 
-    static <T> Node getRoot(RTree<T> tree) {
+    static <T> Node<T> getRoot(RTree<T> tree) {
         Node root;
         try {
             var field = tree.getClass().getDeclaredField("root");
@@ -16,14 +16,14 @@ class RTreeTest {
         } catch (Exception e) {
             return null;
         }
-        assertParentsAndLeafs(root);
+        assertParentsAndLeaves(root);
         return root;
     }
 
-    static void assertParentsAndLeafs(Node root) {
-        for (Node child : root.children)
+    static <T> void assertParentsAndLeaves(Node<T> root) {
+        for (Node<T> child : root.children)
             assertEquals(root, child.parent);
-        root.children.forEach(RTreeTest::assertParentsAndLeafs);
+        root.children.forEach(RTreeTest::assertParentsAndLeaves);
     }
 
     @Test
