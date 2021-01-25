@@ -13,7 +13,7 @@ public class InMemoryWidgetSource implements IWidgetDataSource {
     final private SortedZWidgets sortedZWidgets = new SortedZWidgets();
     final private HashMap<UUID, Widget> widgetsById = new HashMap<>();
     final private ReadWriteLock rwLock = new ReentrantReadWriteLock(true);
-    final private RTree<Widget> rTree = new RTree<>(10, 3);
+    final private RTree<Widget> rTree = new RTree<>(10, 3); // Need stress testing to get optimal values
 
     @Override
     @NonNull
