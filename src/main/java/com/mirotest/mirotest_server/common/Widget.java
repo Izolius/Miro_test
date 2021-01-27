@@ -20,10 +20,16 @@ public class Widget extends Shape {
         this(0);
     }
 
-    public Widget(CreateWidgetParams params) {
+    public Widget(CreateWidgetParams params) throws Exception {
         this(params.zIndex);
         this.width = params.width;
         this.height = params.height;
+        if (width <= 0) {
+            throw new WrongWidgetField("Widget creation with not positive width");
+        }
+        if (height <= 0) {
+            throw new WrongWidgetField("Widget creation with not positive height");
+        }
         this.coord = params.coord;
     }
 }

@@ -2,6 +2,7 @@ package com.mirotest.mirotest_server.datasources.inmem;
 
 import com.mirotest.mirotest_server.common.Widget;
 import com.mirotest.mirotest_server.common.WidgetChanges;
+import com.mirotest.mirotest_server.common.WrongWidgetField;
 
 public class WidgetChangesApplier {
 
@@ -17,10 +18,16 @@ public class WidgetChangesApplier {
         }
         if (changes.width != null) {
             widget.width = changes.width;
+            if (widget.width <= 0) {
+                throw new WrongWidgetField("Widget width have to be positive");
+            }
             wasChanged = true;
         }
         if (changes.height != null) {
             widget.height = changes.height;
+            if (widget.height <= 0) {
+                throw new WrongWidgetField("Widget height have to be positive");
+            }
             wasChanged = true;
         }
         if (wasChanged)
