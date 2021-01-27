@@ -8,6 +8,15 @@ public class SortedZWidgets {
     final private LinkedList<Widget> sortedWidgets = new LinkedList<>();
 
     public void add(Widget widget) {
+        if (widget.zIndex == null) {
+            int nextIndex = 0;
+            if (sortedWidgets.size() > 0) {
+                nextIndex = sortedWidgets.getLast().zIndex + 1;
+            }
+            widget.zIndex = nextIndex;
+            sortedWidgets.add(widget);
+            return;
+        }
         int insertIndex = Collections.binarySearch(sortedWidgets, widget, Comparator.comparingInt(o -> o.zIndex));
         if (insertIndex >= 0) {
             var iter = sortedWidgets.listIterator(insertIndex);

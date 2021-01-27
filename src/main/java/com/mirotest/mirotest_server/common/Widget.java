@@ -6,10 +6,10 @@ import java.util.Date;
 import java.util.UUID;
 
 public class Widget extends Shape {
-    public int zIndex;
+    public Integer zIndex;
     public final Date lastModificationTime;
     public final UUID id;
-    public Widget(int zIndex) {
+    public Widget(Integer zIndex) {
         super();
         this.zIndex = zIndex;
         id = UUID.randomUUID();

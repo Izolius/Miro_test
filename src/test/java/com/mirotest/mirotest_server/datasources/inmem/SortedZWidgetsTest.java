@@ -184,4 +184,21 @@ class SortedZWidgetsTest {
         pageInfo.currentPage=3;
         assertArrayEquals(new Object[]{10}, Paginator.paginate(ws.toList(), pageInfo).stream().map(w -> w.zIndex).toArray());
     }
+
+    @Test
+    void nullZIndexFirst() {
+        var ws = new SortedZWidgets();
+        var widget = new Widget((Integer) null);
+        ws.add(widget);
+        assertEquals(widget.zIndex, 0);
+    }
+
+    @Test
+    void nullZIndexSecond() {
+        var ws = new SortedZWidgets();
+        ws.add(new Widget(2));
+        var widget = new Widget((Integer) null);
+        ws.add(widget);
+        assertEquals(widget.zIndex, 3);
+    }
 }

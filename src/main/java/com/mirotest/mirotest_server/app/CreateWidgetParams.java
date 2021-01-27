@@ -10,7 +10,7 @@ public class CreateWidgetParams {
     public Point coord=new Point();
 
     @Nullable
-    public int zIndex;
+    public Integer zIndex;
 
     @NonNull
     public int width, height;
